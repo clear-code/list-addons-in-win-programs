@@ -5,8 +5,23 @@
 */
 
 var registry = require('registry').registry;
+var { AddonManager } = Cu.import('resource://gre/modules/AddonManager.jsm', {});
+var { Services } = Cu.import('resource://gre/modules/Services.jsm', {});
 var basePath = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
 
 var installed = registry.getChildren(basePath);
 
 console.log(installed.join('\n'));
+
+
+AddonManager.getAllAddons(function(addons) {
+  addons.forEach(function(addon) {
+    if (addon.type !== 'extension')
+      return;
+    console.log(Services.appinfo.ID);
+    console.log(addon.id);
+    console.log(addon.name);
+    console.log(addon.version);
+    console.log(addon.type);
+  });
+});
