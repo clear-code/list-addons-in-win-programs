@@ -1,3 +1,6 @@
 [submodule "makexpi"]
 	path = makexpi
 	url = https://github.com/piroor/makexpi
+[submodule "extlib/js-codemodule-registry"]
+	path = extlib/js-codemodule-registry
+	url = https://github.com/clear-code/js-codemodule-registry.git
