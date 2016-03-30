@@ -25,3 +25,12 @@ AddonManager.getAllAddons(function(addons) {
     console.log(addon.type);
   });
 });
+
+function writeUninstallInfo() {
+  // TODO Write to registry
+  //var base = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\FirefoxAddonsTest\\';
+  //registry.setValue(base + 'DisplayName', 'Firefox Addons Test');
+  //registry.setValue(base + 'DisplayVersion', '0.2');
+  //registry.setValue(base + 'UninstallString', 'C:\\Program Files (x86)\\ClearCode Inc.\\FxDemoInstaller\\uninst.exe');
+  //registry.setValue(base + 'DisplayIcon', 'C:\\Program Files (x86)\\ClearCode Inc.\\FxDemoInstaller\\uninst.exe');
+}
