@@ -30,8 +30,8 @@ function createRegistryKey(aAddon) {
   return key;
 }
 
-function writeUninstallInfo(aKey, aAddon) {
-  log('writeUninstallInfo');
+function registerUninstallInfo(aKey, aAddon) {
+  log('registerUninstallInfo');
   log('aKey: ' + aKey);
   log('aAddon: ' + aAddon.id);
   registry.setValue(aKey + '\\' + 'DisplayName', Services.appinfo.name + ': ' + aAddon.name);
@@ -48,7 +48,7 @@ AddonManager.getAllAddons(function(aAddons) {
     if (aAddon.type !== 'extension')
       return;
     var key = createRegistryKey(aAddon);
-    writeUninstallInfo(key, aAddon);
+    registerUninstallInfo(key, aAddon);
     currentInstalledAddonKeys.push(key);
   });
 
