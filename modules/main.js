@@ -23,22 +23,43 @@ log('installed: ' + installed.join('\n'));
 log('Services.appinfo.ID: ' + Services.appinfo.ID);
 log('Services.appinfo.name: ' + Services.appinfo.name);
 
-function writeUninstallInfo(aAddon) {
-  log('writeUninstallInfo');
-  log('aAddon: ' + aAddon.id);
-  var key = basePath + '\\' + Services.appinfo.ID + '.' + aAddon.id + '\\';
+function createRegistryKey(aAddon) {
+  log('createRegistryKey');
+  var key = basePath + '\\' + Services.appinfo.ID + '.' + aAddon.id;
   log('key: ' + key);
-  registry.setValue(key + 'DisplayName', Services.appinfo.name + ': ' + aAddon.name);
-  registry.setValue(key + 'DisplayVersion', aAddon.version);
-  registry.setValue(key + 'UninstallString', exePath);
-  registry.setValue(key + 'DisplayIcon', exePath + ',0');
-  registry.setValue(key + 'Publisher', aAddon.creator.name);
+  return key;
 }
+
+function writeUninstallInfo(aKey, aAddon) {
+  log('writeUninstallInfo');
+  log('aKey: ' + aKey);
+  log('aAddon: ' + aAddon.id);
+  registry.setValue(aKey + '\\' + 'DisplayName', Services.appinfo.name + ': ' + aAddon.name);
+  registry.setValue(aKey + '\\' + 'DisplayVersion', aAddon.version);
+  registry.setValue(aKey + '\\' + 'UninstallString', exePath);
+  registry.setValue(aKey + '\\' + 'DisplayIcon', exePath + ',0');
+  registry.setValue(aKey + '\\' + 'Publisher', aAddon.creator.name);
+}
+
+var currentInstalledAddonKeys = [];
 
 AddonManager.getAllAddons(function(aAddons) {
   aAddons.forEach(function(aAddon) {
     if (aAddon.type !== 'extension')
       return;
-    writeUninstallInfo(aAddon);
+    var key = createRegistryKey(aAddon);
+    writeUninstallInfo(key, aAddon);
+    currentInstalledAddonKeys.push(key);
+  });
+
+  log('currentInstalledAddonKeys: ' + JSON.stringify(currentInstalledAddonKeys));
+
+  installed.forEach(function(key) {
+    log('installed key: ' + key);
+    log('indexOf: ' + currentInstalledAddonKeys.indexOf(key));
+    if (currentInstalledAddonKeys.indexOf(key) === -1) {
+      log('registry.clear: ' + key);
+      registry.clear(key);
+    }
   });
 });
