@@ -30,7 +30,7 @@ function createRegistryKey(aAddon) {
 function registerUninstallInfo(aKey, aAddon) {
   log('registerUninstallInfo');
   log('aKey: ' + aKey);
-  log('aAddon: ' + aAddon.id);
+  log('aAddon.id: ' + aAddon.id);
   registry.setValue(aKey + '\\' + 'DisplayName', Services.appinfo.name + ': ' + aAddon.name);
   registry.setValue(aKey + '\\' + 'DisplayVersion', aAddon.version);
   registry.setValue(aKey + '\\' + 'UninstallString', exePath);
@@ -41,6 +41,9 @@ function registerUninstallInfo(aKey, aAddon) {
 AddonManager.getAllAddons(function(aAddons) {
   var registeringKeys = [];
   aAddons.forEach(function(aAddon) {
+    log('aAddon.id: ' + aAddon.id);
+    log('aAddon.name: ' + aAddon.name);
+    log('aAddon.type: ' + aAddon.type);
     if (aAddon.type !== 'extension')
       return;
     var key = createRegistryKey(aAddon);
