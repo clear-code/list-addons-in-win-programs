@@ -36,9 +36,9 @@ function writeUninstallInfo(aAddon) {
 }
 
 AddonManager.getAllAddons(function(aAddons) {
-  aAddons.forEach(function(addon) {
-    if (addon.type !== 'extension')
+  aAddons.forEach(function(aAddon) {
+    if (aAddon.type !== 'extension')
       return;
-    writeUninstallInfo(addon);
+    writeUninstallInfo(aAddon);
   });
 });
