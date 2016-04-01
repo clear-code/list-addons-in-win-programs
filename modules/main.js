@@ -38,22 +38,22 @@ function registerUninstallInfo(aKey, aAddon) {
 }
 
 AddonManager.getAllAddons(function(aAddons) {
-  var currentInstalledAddonKeys = [];
+  var registeringKeys = [];
   aAddons.forEach(function(aAddon) {
     if (aAddon.type !== 'extension')
       return;
     var key = createRegistryKey(aAddon);
     registerUninstallInfo(key, aAddon);
-    currentInstalledAddonKeys.push(key);
+    registeringKeys.push(key);
   });
-  log('currentInstalledAddonKeys: ' + JSON.stringify(currentInstalledAddonKeys));
+  log('registeringKeys: ' + JSON.stringify(registeringKeys));
 
-  var installed = registry.getChildren(basePath);
-  log('installed: ' + installed.join('\n'));
-  installed.forEach(function(key) {
-    log('installed key: ' + key);
-    log('indexOf: ' + currentInstalledAddonKeys.indexOf(key));
-    if (currentInstalledAddonKeys.indexOf(key) === -1) {
+  var existingKeys = registry.getChildren(basePath);
+  log('existingKeys: ' + existingKeys.join('\n'));
+  existingKeys.forEach(function(key) {
+    log('existing key: ' + key);
+    log('indexOf: ' + registeringKeys.indexOf(key));
+    if (registeringKeys.indexOf(key) === -1) {
       log('registry.clear: ' + key);
       registry.clear(key);
     }
