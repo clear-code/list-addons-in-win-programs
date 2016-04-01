@@ -44,7 +44,10 @@ AddonManager.getAllAddons(function(aAddons) {
     log('aAddon.id: ' + aAddon.id);
     log('aAddon.name: ' + aAddon.name);
     log('aAddon.type: ' + aAddon.type);
+    log('aAddon.hidden: ' + aAddon.hidden);
     if (aAddon.type !== 'extension')
+      return;
+    if (aAddon.hidden)
       return;
     var key = createRegistryKey(aAddon);
     registerUninstallInfo(key, aAddon);
