@@ -12,8 +12,8 @@ var { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
 var exePath = FileUtils.getFile("XREExeF", []).path;
 var basePath = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
 
-function log(message) {
-  console.log('[list-addons-in-win-programs] ' + message);
+function log(aMessage) {
+  console.log('[list-addons-in-win-programs] ' + aMessage);
 }
 
 var installed = registry.getChildren(basePath);
@@ -35,8 +35,8 @@ function writeUninstallInfo(aAddon) {
   registry.setValue(key + 'Publisher', aAddon.creator.name);
 }
 
-AddonManager.getAllAddons(function(addons) {
-  addons.forEach(function(addon) {
+AddonManager.getAllAddons(function(aAddons) {
+  aAddons.forEach(function(addon) {
     if (addon.type !== 'extension')
       return;
     writeUninstallInfo(addon);
