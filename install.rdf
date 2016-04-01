@@ -6,7 +6,7 @@
                    em:id="list-addons-in-win-programs@clear-code.com"
                    em:name="list-addons-in-win-programs"
                    em:version="0.1"
-                   em:description="Register addon informations to Windows registry to list addons in Add or Remove Programs."
+                   em:description="List addons in Windows Add or Remove Programs."
                    em:creator="ClearCode Inc."
                    em:homepageURL="http://www.clear-code.com/"
                    em:bootstrap="true"
