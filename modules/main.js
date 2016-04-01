@@ -4,6 +4,13 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+var BASE = 'extensions.list-addons-in-win-programs@clear-code.com.';
+var prefs = require('lib/prefs').prefs;
+{
+  if (prefs.getDefaultPref(BASE + 'debug') === null)
+    prefs.setDefaultPref(BASE + 'debug', false);
+}
+
 var registry = require('registry').registry;
 var { AddonManager } = Cu.import('resource://gre/modules/AddonManager.jsm', {});
 var { Services } = Cu.import('resource://gre/modules/Services.jsm', {});
@@ -13,8 +20,10 @@ var exePath = FileUtils.getFile("XREExeF", []).path;
 var basePath = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
 var addonBasePath = basePath + '\\' + Services.appinfo.ID + '.';
 
-function log(aMessage) {
-  console.log('[list-addons-in-win-programs] ' + aMessage);
+function log(message) {
+  if (prefs.getPref(BASE + 'debug')) {
+    console.log("auto-confirm: " + message);
+  }
 }
 
 log('Services.appinfo.ID: ' + Services.appinfo.ID);
