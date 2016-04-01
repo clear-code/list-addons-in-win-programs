@@ -62,3 +62,26 @@ AddonManager.getAllAddons(function(aAddons) {
     }
   });
 });
+
+/**
+ * A handler for shutdown event. This will be called when the addon
+ * is disabled or uninstalled (include updating).
+ */
+function shutdown(aReason) {
+  log('shutdown');
+  log('aReason: ' + aReason);
+  switch (aReason) {
+    case 'ADDON_DISABLE':
+    case 'ADDON_UNINSTALL':
+      var existingKeys = registry.getChildren(basePath);
+      log('existingKeys: ' + existingKeys.join('\n'));
+      existingKeys.forEach(function(key) {
+        log('existing key: ' + key);
+        log('indexOf: ' + key.indexOf(addonBasePath));
+        if (key.indexOf(addonBasePath) === 0) {
+          registry.clear(key);
+        }
+      });
+      break;
+  }
+}
