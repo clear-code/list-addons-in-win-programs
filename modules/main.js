@@ -16,10 +16,6 @@ function log(aMessage) {
   console.log('[list-addons-in-win-programs] ' + aMessage);
 }
 
-var installed = registry.getChildren(basePath);
-
-log('installed: ' + installed.join('\n'));
-
 log('Services.appinfo.ID: ' + Services.appinfo.ID);
 log('Services.appinfo.name: ' + Services.appinfo.name);
 
@@ -41,9 +37,8 @@ function registerUninstallInfo(aKey, aAddon) {
   registry.setValue(aKey + '\\' + 'Publisher', aAddon.creator.name);
 }
 
-var currentInstalledAddonKeys = [];
-
 AddonManager.getAllAddons(function(aAddons) {
+  var currentInstalledAddonKeys = [];
   aAddons.forEach(function(aAddon) {
     if (aAddon.type !== 'extension')
       return;
@@ -51,9 +46,10 @@ AddonManager.getAllAddons(function(aAddons) {
     registerUninstallInfo(key, aAddon);
     currentInstalledAddonKeys.push(key);
   });
-
   log('currentInstalledAddonKeys: ' + JSON.stringify(currentInstalledAddonKeys));
 
+  var installed = registry.getChildren(basePath);
+  log('installed: ' + installed.join('\n'));
   installed.forEach(function(key) {
     log('installed key: ' + key);
     log('indexOf: ' + currentInstalledAddonKeys.indexOf(key));
