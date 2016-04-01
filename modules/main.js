@@ -22,7 +22,7 @@ var addonBasePath = basePath + '\\' + Services.appinfo.ID + '.';
 
 function log(message) {
   if (prefs.getPref(BASE + 'debug')) {
-    console.log("[list-addon-in-win-programs] " + message);
+    console.log("[list-addons-in-win-programs] " + message);
   }
 }
 
