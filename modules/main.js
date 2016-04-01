@@ -11,6 +11,7 @@ var { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
 
 var exePath = FileUtils.getFile("XREExeF", []).path;
 var basePath = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
+var addonBasePath = basePath + '\\' + Services.appinfo.ID + '.';
 
 function log(aMessage) {
   console.log('[list-addons-in-win-programs] ' + aMessage);
@@ -21,7 +22,7 @@ log('Services.appinfo.name: ' + Services.appinfo.name);
 
 function createRegistryKey(aAddon) {
   log('createRegistryKey');
-  var key = basePath + '\\' + Services.appinfo.ID + '.' + aAddon.id;
+  var key = addonBasePath + aAddon.id;
   log('key: ' + key);
   return key;
 }
@@ -53,6 +54,8 @@ AddonManager.getAllAddons(function(aAddons) {
   existingKeys.forEach(function(key) {
     log('existing key: ' + key);
     log('indexOf: ' + registeringKeys.indexOf(key));
+    if (key.indexOf(addonBasePath) !== 0)
+      return;
     if (registeringKeys.indexOf(key) === -1) {
       log('registry.clear: ' + key);
       registry.clear(key);
