@@ -7,30 +7,34 @@
 var registry = require('registry').registry;
 var { AddonManager } = Cu.import('resource://gre/modules/AddonManager.jsm', {});
 var { Services } = Cu.import('resource://gre/modules/Services.jsm', {});
+var { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
+
+var exePath = FileUtils.getFile("XREExeF", []).path;
 var basePath = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
 
 var installed = registry.getChildren(basePath);
 
-console.log(installed.join('\n'));
+console.log('installed: ' + installed.join('\n'));
 
+console.log('Services.appinfo.ID: ' + Services.appinfo.ID);
+console.log('Services.appinfo.name: ' + Services.appinfo.name);
+
+function writeUninstallInfo(aAddon) {
+  console.log('writeUninstallInfo');
+  console.log('aAddon: ' + aAddon.id);
+  var key = basePath + '\\' + Services.appinfo.ID + '.' + aAddon.id + '\\';
+  console.log('key: ' + key);
+  registry.setValue(key + 'DisplayName', Services.appinfo.name + ': ' + aAddon.name);
+  registry.setValue(key + 'DisplayVersion', aAddon.version);
+  registry.setValue(key + 'UninstallString', exePath);
+  registry.setValue(key + 'DisplayIcon', exePath + ',0');
+  registry.setValue(key + 'Publisher', aAddon.creator.name);
+}
 
 AddonManager.getAllAddons(function(addons) {
   addons.forEach(function(addon) {
     if (addon.type !== 'extension')
       return;
-    console.log(Services.appinfo.ID);
-    console.log(addon.id);
-    console.log(addon.name);
-    console.log(addon.version);
-    console.log(addon.type);
+    writeUninstallInfo(addon);
   });
 });
-
-function writeUninstallInfo() {
-  // TODO Write to registry
-  //var base = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\FirefoxAddonsTest\\';
-  //registry.setValue(base + 'DisplayName', 'Firefox Addons Test');
-  //registry.setValue(base + 'DisplayVersion', '0.2');
-  //registry.setValue(base + 'UninstallString', 'C:\\Program Files (x86)\\ClearCode Inc.\\FxDemoInstaller\\uninst.exe');
-  //registry.setValue(base + 'DisplayIcon', 'C:\\Program Files (x86)\\ClearCode Inc.\\FxDemoInstaller\\uninst.exe');
-}
