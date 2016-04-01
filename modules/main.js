@@ -12,18 +12,22 @@ var { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
 var exePath = FileUtils.getFile("XREExeF", []).path;
 var basePath = 'HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall';
 
+function log(message) {
+  console.log('[list-addons-in-win-programs] ' + message);
+}
+
 var installed = registry.getChildren(basePath);
 
-console.log('installed: ' + installed.join('\n'));
+log('installed: ' + installed.join('\n'));
 
-console.log('Services.appinfo.ID: ' + Services.appinfo.ID);
-console.log('Services.appinfo.name: ' + Services.appinfo.name);
+log('Services.appinfo.ID: ' + Services.appinfo.ID);
+log('Services.appinfo.name: ' + Services.appinfo.name);
 
 function writeUninstallInfo(aAddon) {
-  console.log('writeUninstallInfo');
-  console.log('aAddon: ' + aAddon.id);
+  log('writeUninstallInfo');
+  log('aAddon: ' + aAddon.id);
   var key = basePath + '\\' + Services.appinfo.ID + '.' + aAddon.id + '\\';
-  console.log('key: ' + key);
+  log('key: ' + key);
   registry.setValue(key + 'DisplayName', Services.appinfo.name + ': ' + aAddon.name);
   registry.setValue(key + 'DisplayVersion', aAddon.version);
   registry.setValue(key + 'UninstallString', exePath);
