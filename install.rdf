@@ -4,8 +4,8 @@
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="list-addons-in-win-programs@clear-code.com"
-                   em:name="list-addons-in-win-programs"
-                   em:version="1.0"
+                   em:name="List Addons in Windows' Programs"
+                   em:version="1.1"
                    em:description="List addons in Windows Add or Remove Programs."
                    em:creator="ClearCode Inc."
                    em:homepageURL="http://www.clear-code.com/"
