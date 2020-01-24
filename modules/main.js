@@ -44,7 +44,7 @@ function registerUninstallInfo(aKey, aAddon) {
   registry.setValue(aKey + '\\' + 'DisplayVersion', aAddon.version);
   registry.setValue(aKey + '\\' + 'UninstallString', exePath);
   registry.setValue(aKey + '\\' + 'DisplayIcon', exePath + ',0');
-  registry.setValue(aKey + '\\' + 'Publisher', aAddon.creator.name);
+  registry.setValue(aKey + '\\' + 'Publisher', aAddon.creator && aAddon.creator.name || 'unknown');
 }
 
 AddonManager.getAllAddons().then(aAddons => {
