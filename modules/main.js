@@ -47,7 +47,7 @@ function registerUninstallInfo(aKey, aAddon) {
   registry.setValue(aKey + '\\' + 'Publisher', aAddon.creator.name);
 }
 
-AddonManager.getAllAddons(function(aAddons) {
+AddonManager.getAllAddons().then(aAddons => {
   var registeringKeys = [];
   aAddons.forEach(function(aAddon) {
     log('aAddon.id: ' + aAddon.id);

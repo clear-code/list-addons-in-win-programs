@@ -41,7 +41,7 @@ try {
 	Components.utils.reportError(new Error('failed to load Services.jsm'));
 }
 try {
-	var { console } = Components.utils.import('resource://gre/modules/devtools/Console.jsm', {});
+	var { console } = Components.utils.import('resource://gre/modules/Console.jsm', {});
 } catch(e) {
 	Components.utils.reportError(new Error('failed to load Console.jsm'));
 }

@@ -20,6 +20,13 @@ var _gResourceRegistered = false;
 
 function _load(aScriptName, aId, aRoot, aReason)
 {
+	if (typeof aRoot == 'string') {
+		let file = Components.classes['@mozilla.org/file/local;1']
+			.createInstance(Components.interfaces.nsIFile);
+		file.initWithPath(aRoot);
+		aRoot = file;
+	}
+
 	const IOService = Components.classes['@mozilla.org/network/io-service;1']
 						.getService(Components.interfaces.nsIIOService);
 
