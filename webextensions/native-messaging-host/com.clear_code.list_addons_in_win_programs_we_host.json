@@ -1,0 +1,9 @@
+{
+  "name": "com.clear_code.list_addons_in_win_programs_we_host",
+  "description": "List Addons in Windows' Programs Native Messaging Host",
+  "path": "host.exe",
+  "type": "stdio",
+  "allowed_extensions": [
+    "list-addons-in-win-programs@clear-code.com"
+  ]
+}

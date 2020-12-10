@@ -1,0 +1,6 @@
+*.xpi
+*.zip
+.goutputstream-*
+
+# node.js dependency
+node_modules/
