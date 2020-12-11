@@ -50,6 +50,7 @@ async function addToRegistry(addon) {
         id:      addon.id,
         name:    addon.name,
         version: addon.version,
+        creator: 'unknown',
       },
     });
     console.log('addToRegistry response: ', addon.id, response);

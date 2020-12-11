@@ -15,7 +15,7 @@ import (
 
 const VERSION = "1.99";
 
-const BASE_PATH = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+const BASE_PATH = `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`;
 const APP_ID_FIREFOX = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 const APP_ID_THUNDERBIRD = "{3550f703-e582-4d05-9a08-453d09bdfdc6}";
 
@@ -23,6 +23,7 @@ type RequestParams struct {
 	Id      string `json:id`
 	Name    string `json:name`
 	Version string `json:version`
+	Creator string `json:creator`
 }
 type Request struct {
 	Command string        `json:"command"`
@@ -81,16 +82,27 @@ func main() {
 	}
 }
 
-func GetAppId() (appId string) {
+func GetAppName() (appName string) {
 	parentPID := os.Getppid()
 	pidInfo, _ := ps.FindProcess(parentPID)
 	if strings.Contains(pidInfo.Executable(), "firefox") {
-		return APP_ID_FIREFOX
+		return "Firefox"
 	}
 	if strings.Contains(pidInfo.Executable(), "thunderbird") {
+		return "Thunderbird"
+	}
+	return "Unknown"
+}
+
+func GetAppId() (appId string) {
+	switch GetAppName()  {
+	case "Firefox":
+	default:
+		return APP_ID_FIREFOX
+	case "Thunderbird":
 		return APP_ID_THUNDERBIRD
 	}
-	return APP_ID_FIREFOX
+	return ""
 }
 
 type BasicResponse struct {
@@ -111,7 +123,60 @@ func RegisterAndRespond(params RequestParams) {
 }
 
 func Register(params RequestParams) (errorMessage string) {
+	prefix := GetAppId() + "."
+	parentKey, err := registry.OpenKey(registry.CURRENT_USER, BASE_PATH, registry.CREATE_SUB_KEY)
+	if err != nil {
+		return err.Error()
+	}
+	defer parentKey.Close()
+
+	addonKey, _, err := registry.CreateKey(parentKey, prefix + params.Id, registry.SET_VALUE)
+	if err != nil {
+		return err.Error()
+	}
+	defer addonKey.Close()
+
+	err = addonKey.SetStringValue("DisplayName", GetAppName() + ": " + params.Name)
+	if err != nil {
+		return err.Error()
+	}
+	err = addonKey.SetStringValue("DisplayVersion", params.Version)
+	if err != nil {
+		return err.Error()
+	}
+	appPath := GetAppPath()
+	err = addonKey.SetStringValue("UninstallString", appPath)
+	if err != nil {
+		return err.Error()
+	}
+	err = addonKey.SetStringValue("DisplayIcon", appPath + ",0")
+	if err != nil {
+		return err.Error()
+	}
+	err = addonKey.SetStringValue("Publisher", params.Creator)
+	if err != nil {
+		return err.Error()
+	}
+
 	return ""
+}
+
+func GetAppPath() (path string) {
+	parentPID := os.Getppid()
+	pidInfo, _ := ps.FindProcess(parentPID)
+	key, err := registry.OpenKey(registry.LOCAL_MACHINE,
+		`SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\` + pidInfo.Executable(),
+		registry.QUERY_VALUE)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer key.Close()
+
+	path, _, err = key.GetStringValue("")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
 }
 
 func UnregisterAndRespond(params RequestParams) {
@@ -129,7 +194,7 @@ func UnregisterAndRespond(params RequestParams) {
 
 func Unregister(id string) (errorMessage string) {
 	prefix := GetAppId() + "."
-	err := registry.DeleteKey(registry.CURRENT_USER, BASE_PATH + "\\" + prefix + id)
+	err := registry.DeleteKey(registry.CURRENT_USER, BASE_PATH + `\` + prefix + id)
 	if err != nil {
 		return err.Error()
 	}
@@ -155,13 +220,13 @@ func GetRegisteredIdsAndRespond() {
 }
 
 func GetRegisteredIds() (ids []string, errorMessage string) {
-	key, err := registry.OpenKey(registry.CURRENT_USER, BASE_PATH, registry.ENUMERATE_SUB_KEYS)
+	parentKey, err := registry.OpenKey(registry.CURRENT_USER, BASE_PATH, registry.ENUMERATE_SUB_KEYS)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer key.Close()
+	defer parentKey.Close()
 
-	subkeyNames, err := key.ReadSubKeyNames(-1)
+	subkeyNames, err := parentKey.ReadSubKeyNames(-1)
 	if err != nil {
 		log.Fatal(err)
 	}
