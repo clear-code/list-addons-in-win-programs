@@ -42,6 +42,14 @@ browser.management.onDisabled.addListener(addon => {
 
 async function addToRegistry(addon) {
   console.log('addToRegistry: ', addon);
+  if (addon.type != 'extension') {
+    console.log(' => ignore non-extension addon');
+    return;
+  }
+  if (addon.id.endsWith('@search.mozilla.org')) {
+    console.log(' => ignore default search providers');
+    return;
+  }
   mAddons.set(addon.id, addon);
   try {
     const response = await sendToHost({
