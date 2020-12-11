@@ -45,8 +45,12 @@ async function addToRegistry(addon) {
   mAddons.set(addon.id, addon);
   try {
     const response = await sendToHost({
-      type: 'register-addon',
-      addon,
+      command: 'register-addon',
+      params: {
+        id:      addon.id,
+        name:    addon.name,
+        version: addon.version,
+      },
     });
     console.log('addToRegistry response: ', addon.id, response);
   }
@@ -60,8 +64,10 @@ async function removeFromRegistry(id) {
   mAddons.delete(id);
   try {
     const response = await sendToHost({
-      type: 'unregister-addon',
-      id,
+      command: 'unregister-addon',
+      params: {
+        id,
+      },
     });
     console.log('removeFromRegistry response: ', id, response);
   }
@@ -74,8 +80,9 @@ async function getRegisteredAddonIds() {
   /*
   try {
     const response = await sendToHost({
-      type: 'list-registered-addons',
+      command: 'list-registered-addons',
     });
+    return response.addons;
   }
   catch(error) {
     console.error(error);
