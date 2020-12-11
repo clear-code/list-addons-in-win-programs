@@ -5,6 +5,8 @@
 */
 'use strict';
 
+const HOST_ID = 'com.clear_code.list_addons_in_win_programs_we_host';
+
 const mAddons = new Map();
 
 browser.management.getAll().then(async addons => {
@@ -38,16 +40,60 @@ browser.management.onDisabled.addListener(addon => {
   }
 });
 
-function addToRegistry(addon) {
+async function addToRegistry(addon) {
   console.log('addToRegistry: ', addon);
   mAddons.set(addon.id, addon);
+  try {
+    const response = await sendToHost({
+      type: 'register-addon',
+      addon,
+    });
+    console.log('addToRegistry response: ', addon.id, response);
+  }
+  catch(error) {
+    console.error(error);
+  }
 }
 
-function removeFromRegistry(id) {
+async function removeFromRegistry(id) {
   console.log('removeFromRegistry: ', id);
   mAddons.delete(id);
+  try {
+    const response = await sendToHost({
+      type: 'unregister-addon',
+      id,
+    });
+    console.log('removeFromRegistry response: ', id, response);
+  }
+  catch(error) {
+    console.error(error);
+  }
 }
 
 async function getRegisteredAddonIds() {
+  /*
+  try {
+    const response = await sendToHost({
+      type: 'list-registered-addons',
+    });
+  }
+  catch(error) {
+    console.error(error);
+    return [];
+  }
+  */
   return [];
+}
+
+async function sendToHost(message) {
+  try {
+    const response = await browser.runtime.sendNativeMessage(HOST_ID, message);
+    if (!response || typeof response != 'object')
+      throw new Error(`invalid response: ${String(response)}`);
+    return response;
+  }
+  catch(error) {
+    console.log('Error: failed to get response for message', message, error);
+    return null;
+  }
 }
