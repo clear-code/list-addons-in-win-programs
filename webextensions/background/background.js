@@ -78,19 +78,16 @@ async function removeFromRegistry(id) {
 }
 
 async function getRegisteredAddonIds() {
-  /*
   try {
     const response = await sendToHost({
       command: 'list-registered-addons',
     });
-    return response.addons;
+    return response.ids;
   }
   catch(error) {
     console.error(error);
     return [];
   }
-  */
-  return [];
 }
 
 async function sendToHost(message) {
