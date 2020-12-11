@@ -97,7 +97,6 @@ func GetAppName() (appName string) {
 func GetAppId() (appId string) {
 	switch GetAppName()  {
 	case "Firefox":
-	default:
 		return APP_ID_FIREFOX
 	case "Thunderbird":
 		return APP_ID_THUNDERBIRD
