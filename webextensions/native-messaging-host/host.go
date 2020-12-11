@@ -30,11 +30,19 @@ type Request struct {
 	Params  RequestParams `json:"params"`
 }
 
+var appName = "";
+
 func main() {
-	shouldReportVersion := flag.Bool("v", false, "v")
-	shouldListAddonIds := flag.Bool("l", false, "l")
-	shouldCleanUp := flag.Bool("c", false, "c")
+	shouldReportVersion := flag.Bool("v", false, "Output version")
+	shouldListAddonIds := flag.Bool("l", false, "List registered addons")
+	shouldCleanUp := flag.Bool("c", false, "Clean up registered addons")
+	givenAppName := flag.String("a", "", "Name of the host application (Firefox or Thunderbird)")
 	flag.Parse()
+	if *givenAppName != "" {
+		appName = *givenAppName
+	} else {
+		appName = GetAppName()
+	}
 	if *shouldReportVersion == true {
 		fmt.Println(VERSION)
 		return
@@ -95,7 +103,7 @@ func GetAppName() (appName string) {
 }
 
 func GetAppId() (appId string) {
-	switch GetAppName()  {
+	switch appName {
 	case "Firefox":
 		return APP_ID_FIREFOX
 	case "Thunderbird":
@@ -135,7 +143,7 @@ func Register(params RequestParams) (errorMessage string) {
 	}
 	defer addonKey.Close()
 
-	err = addonKey.SetStringValue("DisplayName", GetAppName() + ": " + params.Name)
+	err = addonKey.SetStringValue("DisplayName", appName + ": " + params.Name)
 	if err != nil {
 		return err.Error()
 	}
