@@ -31,6 +31,7 @@ main() {
   echo "preparing dependencies..."
   prepare_dependency github.com/lhside/chrome-go
   prepare_dependency github.com/mitchellh/go-ps
+  prepare_dependency github.com/lestrrat/go-file-rotatelogs
   mkdir -p "$temp_src"
   ln -s "$dist_dir" "$temp_src/host"
 

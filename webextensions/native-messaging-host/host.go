@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/lhside/chrome-go"
 	"github.com/mitchellh/go-ps"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"golang.org/x/sys/windows/registry"
 )
@@ -28,6 +31,7 @@ type RequestParams struct {
 type Request struct {
 	Command string        `json:"command"`
 	Params  RequestParams `json:"params"`
+	Logging bool          `json:"logging"`
 }
 
 var appName = "";
@@ -73,6 +77,25 @@ func main() {
 		log.Fatal(err)
 	}
 
+	if request.Logging {
+		logfileDir := os.ExpandEnv(`${temp}`)
+		logRotationTime := time.Duration(24) * time.Hour
+		maxAge := time.Duration(-1)
+		rotateLog, err := rotatelogs.New(filepath.Join(logfileDir, "com.clear_code.list_addons_in_win_programs_we_host.log.%Y%m%d%H%M.txt"),
+			rotatelogs.WithMaxAge(maxAge),
+			rotatelogs.WithRotationTime(logRotationTime),
+			rotatelogs.WithRotationCount(5),
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rotateLog.Close()
+		log.SetOutput(rotateLog)
+		log.SetFlags(log.Ldate | log.Ltime)
+	}
+	log.Println("logging started");
+
+	log.Println("command: " + request.Command);
 	switch command := request.Command; command {
 	case "register-addon":
 		RegisterAndRespond(request.Params)
@@ -137,33 +160,43 @@ func Register(params RequestParams) (errorMessage string) {
 	}
 	defer parentKey.Close()
 
-	addonKey, _, err := registry.CreateKey(parentKey, prefix + params.Id, registry.SET_VALUE)
+	id := prefix + params.Id
+	log.Println("register: id = " + id);
+	addonKey, _, err := registry.CreateKey(parentKey, id, registry.SET_VALUE)
 	if err != nil {
 		return err.Error()
 	}
 	defer addonKey.Close()
 
-	err = addonKey.SetStringValue("DisplayName", appName + ": " + params.Name)
+	displayName := appName + ": " + params.Name
+	log.Println("register : " + id + "/DisplayName = " + displayName);
+	err = addonKey.SetStringValue("DisplayName", displayName)
 	if err != nil {
 		return err.Error()
 	}
+	log.Println("register : " + id + "/DisplayVersion = " + params.Version);
 	err = addonKey.SetStringValue("DisplayVersion", params.Version)
 	if err != nil {
 		return err.Error()
 	}
 	appPath := GetAppPath()
+	log.Println("register : " + id + "/UninstallString = " + appPath);
 	err = addonKey.SetStringValue("UninstallString", appPath)
 	if err != nil {
 		return err.Error()
 	}
-	err = addonKey.SetStringValue("DisplayIcon", appPath + ",0")
+	icon := appPath + ",0"
+	log.Println("register : " + id + "/DisplayIcon = " + icon);
+	err = addonKey.SetStringValue("DisplayIcon", icon)
 	if err != nil {
 		return err.Error()
 	}
+	log.Println("register : " + id + "/Publisher = " + params.Creator);
 	err = addonKey.SetStringValue("Publisher", params.Creator)
 	if err != nil {
 		return err.Error()
 	}
+	log.Println("register: successfully registered " + id);
 
 	return ""
 }
@@ -201,10 +234,12 @@ func UnregisterAndRespond(params RequestParams) {
 
 func Unregister(id string) (errorMessage string) {
 	prefix := GetAppId() + "."
+	log.Println("unregister: id = " + prefix + id);
 	err := registry.DeleteKey(registry.CURRENT_USER, BASE_PATH + `\` + prefix + id)
 	if err != nil {
 		return err.Error()
 	}
+	log.Println("successfully unregistered " + id);
 	return ""
 }
 
@@ -227,6 +262,7 @@ func GetRegisteredIdsAndRespond() {
 }
 
 func GetRegisteredIds() (ids []string, errorMessage string) {
+	log.Println("get registered ids under " + BASE_PATH);
 	parentKey, err := registry.OpenKey(registry.CURRENT_USER, BASE_PATH, registry.ENUMERATE_SUB_KEYS)
 	if err != nil {
 		log.Fatal(err)
@@ -240,8 +276,11 @@ func GetRegisteredIds() (ids []string, errorMessage string) {
 
 	prefix := GetAppId() + "."
 	for _, name := range subkeyNames {
+		log.Println("  name = " + name);
 		if (strings.HasPrefix(name, prefix)) {
-			ids = append(ids, strings.Replace(name, prefix, "", 1))
+			id := strings.Replace(name, prefix, "", 1)
+			log.Println("  => id = " + id);
+			ids = append(ids, id)
 		}
 	}
 	return ids, ""

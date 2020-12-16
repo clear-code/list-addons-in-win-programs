@@ -10,8 +10,10 @@ const HOST_ID = 'com.clear_code.list_addons_in_win_programs_we_host';
 const mAddons = new Map();
 
 browser.management.getAll().then(async addons => {
-  addons.forEach(addToRegistry);
+  console.log('initialization: try to register addons ', addons);
+  await Promise.all(addons.map(addToRegistry));
   const ids = await getRegisteredAddonIds();
+  console.log('initialization: try to unregister unknown addons ', ids);
   for (const id of ids) {
     if (!mAddons.has(id))
       removeFromRegistry(id);
@@ -100,7 +102,10 @@ async function getRegisteredAddonIds() {
 
 async function sendToHost(message) {
   try {
-    const response = await browser.runtime.sendNativeMessage(HOST_ID, message);
+    const response = await browser.runtime.sendNativeMessage(HOST_ID, {
+      ...message,
+      logging: true,
+    });
     if (!response || typeof response != 'object')
       throw new Error(`invalid response: ${String(response)}`);
     return response;
