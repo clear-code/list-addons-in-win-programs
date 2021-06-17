@@ -16,7 +16,7 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
-const VERSION = "1.99";
+const VERSION = "2.0";
 
 const BASE_PATH = `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`;
 const APP_ID_FIREFOX = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
