@@ -1,0 +1,32 @@
+{
+  "product": "List Addons in Windows' Programs Native Messaging Host",
+  "company": "ClearCode Inc.",
+  "upgrade-code": "0d87d3c1-4ecc-4108-89fe-aeaeb309b3ce",
+  "files": {
+    "guid": "3e2a5d89-b78c-493c-92c4-e7d5c0664644",
+    "items": [
+      "host.exe",
+      "com.clear_code.list_addons_in_win_programs_we_host.json"
+    ]
+  },
+  "env": {
+    "guid": "efca2a7d-23dc-4655-be13-09f3258d7028",
+    "vars": [
+      {
+        "name": "PATH",
+        "value": "[INSTALLDIR]",
+        "permanent": "no",
+        "system": "no",
+        "action": "set",
+        "part": "last"
+      }
+    ]
+  },
+  "shortcuts": {},
+  "choco": {
+    "description": "List Addons in Windows' Programs Native Messaging Host",
+    "project-url": "https://github.com/clear-code/list-addons-in-win-programs",
+    "tags": "firefox thunderbird addon",
+    "license-url": "https://github.com/clear-code/list-addons-in-win-programs/blob/master/webextensions/native-messaging-host/LICENSE"
+  }
+}
