@@ -25,4 +25,4 @@ xpi: lint
 host:
 	native-messaging-host/build.sh
 	rm -f list-addons-in-win-programs.zip
-	cd native-messaging-host && zip -r -9 ../list-addons-in-win-programs.zip 386 amd64 *.bat *.json
+	cd native-messaging-host && zip -r -9 ../list-addons-in-win-programs-host.zip 386 amd64 *.bat com.clear_code.*.json
