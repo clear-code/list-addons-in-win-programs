@@ -11,12 +11,21 @@ const mAddons = new Map();
 
 browser.management.getAll().then(async addons => {
   console.log('initialization: try to register addons ', addons);
-  await Promise.all(addons.map(addToRegistry));
+
+  // Process addons sequentially instead of parallel sending with Promise.all(),
+  // to avoid sending of multiple native messages at a time.
+  // Sending too many native messages at a time looks to cause
+  // breakage of native messaging system totally and it may break
+  // other addons which depends on native messaging.
+  for (const addon of addons) {
+    await addToRegistry(addon);
+  }
+
   const ids = await getRegisteredAddonIds();
   console.log('initialization: try to unregister unknown addons ', ids);
   for (const id of ids) {
     if (!mAddons.has(id))
-      removeFromRegistry(id);
+      await removeFromRegistry(id);
   }
 });
 
